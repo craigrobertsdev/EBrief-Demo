@@ -5,7 +5,6 @@ using EBrief.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
-using Radzen;
 
 namespace EBrief.Pages;
 public partial class CourtListPage

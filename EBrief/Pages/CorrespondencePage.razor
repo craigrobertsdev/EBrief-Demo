@@ -8,6 +8,10 @@
     {
         <p>No correspondence to display</p>
     }
+    else if (Parent.ActiveDefendant?.ActiveCaseFile?.DocumentsLoaded == false)
+    {
+        <p>No documents loaded for this court list</p>
+    }
     else if (_selectedDocument is null)
     {
         <p>Loading...</p>
@@ -43,6 +47,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (Parent.ActiveDefendant?.ActiveCaseFile?.DocumentsLoaded == false)
+        {
+            return;
+        }
+
         await HandleDefendantChange();
         Parent.OnDefendantChange += HandleDefendantChange;
     }
