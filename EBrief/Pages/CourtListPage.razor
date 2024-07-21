@@ -1,0 +1,154 @@
+@page "/court-list"
+
+@using EBrief.Components
+@using EBrief.Models.UI
+@using Microsoft.JSInterop
+@using Radzen.Blazor
+@using System.Text
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+
+@if (_error is not null)
+{
+    <p>@_error</p>
+    <RadzenButton Text="Back to start" Click="HandleReturnHome" />
+}
+
+else if (_loading)
+{
+    <div class="w-full h-full flex justify-center items-center">
+        <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate" ShowValue=false />
+    </div>
+}
+else
+{
+    <CascadingValue Value="this">
+        <div class="h-full grid grid-cols-[0.2fr_1fr] grid-rows-[auto_1fr] pt-2">
+            @* Defendant column *@
+            <div id="defendant-container" class="row-span-2 overflow-auto max-h-full pl-2">
+                <div class="flex flex-col mr-2 h-full ">
+                    <TreeView CourtSittings="CourtSittings" />
+                </div>
+            </div>
+            @if (ActiveDefendant is null)
+            {
+                <div class="pb-2">
+                </div>
+            }
+            else
+            {
+                // Case files row
+                <div class="grid grid-cols-[1fr_auto] gap-6 mb-2 pr-4 flex ml-2 justify-between max-w-full relative">
+                    <div id="casefile-container" class="overflow-x-auto">
+                        <div class="flex w-auto w-full">
+                            @foreach (var caseFile in ActiveDefendant.CaseFiles)
+                            {
+                                <Tooltip Text="@GenerateCaseFileTooltipText(caseFile)" Id="@caseFile.CaseFileNumber">
+                                    <div class="border text-[0.8rem] min-w-[20ch] text-center @IsSelected(caseFile)" @onclick="() => CaseFileChanged(caseFile)">
+                                        <p class="py-1 select-none">
+                                            @caseFile.CaseFileNumber
+                                        </p>
+                                        <p class="pb-1 select-none">
+                                            @caseFile.CourtFileNumber
+                                        </p>
+                                    </div>
+                                </Tooltip>
+                            }
+                        </div>
+                    </div>
+
+                    @* Court List Menu *@
+                    <div class="max-w-2xl">
+                        <RadzenMenu Style="margin: 5px 5px 0 0">
+                            <RadzenMenuItem Style="padding: 3px 6px; " Text="Menu">
+                                <RadzenMenuItem Text="Save" Click="SaveCourtList" />
+                                <RadzenMenuItem Text="Export Court List" Click="ExportCourtList" />
+                                <RadzenMenuItem Text="Return Home" Click="HandleReturnHome" />
+                            </RadzenMenuItem>
+                        </RadzenMenu>
+                    </div>
+                </div>
+            }
+            <div class="h-full ml-2">
+                <CascadingValue Value="DataAccess">
+                    <TabControl>
+                        <TabPage Title="CFEL">
+                            <CfelPage />
+                        </TabPage>
+                        <TabPage Title="Information">
+                            <InformationPage />
+                        </TabPage>
+                        <TabPage Title="Facts of Charge">
+                            <FactsOfChargePage />
+                        </TabPage>
+                        <TabPage Title="Correspondence">
+                            <CorrespondencePage />
+                        </TabPage>
+                        <TabPage Title="Evidence">
+                            <EvidencePage />
+                        </TabPage>
+                        <TabPage Title="Orders">
+                            <OrdersPage />
+                        </TabPage>
+                        <TabPage Title="Additional Info">
+                            <AdditionalInfoPage />
+                        </TabPage>
+                        <TabPage Title="Schedule">
+                            <SchedulePage />
+                        </TabPage>
+                        <TabPage Title="Follow-Ups">
+                            <FollowUpsPage />
+                        </TabPage>
+                        <TabPage Title="Notes">
+                            <NotesPage />
+                        </TabPage>
+                    </TabControl>
+                </CascadingValue>
+            </div>
+
+        </div>
+    </CascadingValue>
+
+    <style>
+        .rz-menu .rz-navigation-item {
+            direction: rtl;
+        }
+
+        .rz-navigation-item-icon-children {
+            display: none !important;
+        }
+    </style>
+}
+
+<dialog @ref="UnsavedChangesDialog" class="p-5">
+    <h3 class="text-lg">You have unsaved changes. Do you wish to continue?</h3>
+    <div class="flex w-full justify-end gap-3">
+        <RadzenButton Text="Confirm" Click="SaveChanges" />
+        <RadzenButton Text="Cancel" Click="CloseUnsavedChangesDialog" />
+    </div>
+</dialog>
+
+@code {
+    private MarkupString GenerateCaseFileTooltipText(CaseFile caseFile)
+    {
+        var markup = new StringBuilder();
+        int maxCharges = 4;
+
+        if (caseFile.Charges.Count > maxCharges)
+        {
+            markup.Append($"<p class=\"pb-2 text-sm\">{caseFile.Charges.Count} total charges</p>");
+        }
+        foreach (var (charge, i) in caseFile.Charges.Take(maxCharges).Select((c, i) => (c, i)))
+        {
+            if (i == maxCharges)
+            {
+                markup.Append($"<p>{i + 1}. {charge.Date:d}: {charge.Name}</p>");
+            }
+            else
+            {
+                markup.Append($"<p class=\"pb-2\">{i + 1}. {charge.Date:d}: {charge.Name}</p>");
+            }
+        }
+        return new MarkupString(markup.ToString());
+    }
+}
