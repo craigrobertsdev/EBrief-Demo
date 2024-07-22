@@ -58,6 +58,12 @@ dotnet run
 
 3. The first time you launch the application, you will need to generate a court list by clicking on the `Load New Court List` button. Fill in the information in the dropdowns (it is all test data so you can choose any option) and provide a list of unique numbers separated by spaces or line breaks. A sample list is stored [here](https://github.com/craigrobertsdev/EBrief-Demo/blob/main/sample-case-numbers.txt).
 
+![Home screen](https://github.com/craigrobertsdev/EBrief-Demo/blob/main/Images/Home%20Screen.png)
+
+![Information screen](https://github.com/craigrobertsdev/EBrief-Demo/blob/main/Images/Information%20screen.png)
+
+![Correspondence screen](https://github.com/craigrobertsdev/EBrief-Demo/blob/main/Images/Correspondence%20screen.png)
+
 ## Questions
 
 If you would like to discuss this project further, please contact me at craig.roberts11@outlook.com, or via [LinkedIn](https://www.linkedin.com/in/craig-roberts-9ba409243/).
