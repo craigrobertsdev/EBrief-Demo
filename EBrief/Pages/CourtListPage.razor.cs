@@ -172,6 +172,11 @@ public partial class CourtListPage
     private void SaveCourtList()
     {
         DataAccess.UpdateCourtList(CourtList);
+
+        foreach (var caseFile in CourtList.GetCaseFiles())
+        {
+            caseFile.Notes.HasChanged = false;
+        }
     }
 
     private async Task ExportCourtList()
